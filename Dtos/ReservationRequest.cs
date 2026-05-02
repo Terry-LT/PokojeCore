@@ -14,10 +14,10 @@ namespace PokojeCore.Dtos
         public string? VoucherId { get; set; }
 
         public string ContactPerson { get; set; } = string.Empty;
-        public int Account { get; set; }
+        public int? AccountId { get; set; }
 
         public string Tasks { get; set; } = string.Empty;
-        public string ModifiedBy { get; set; } = string.Empty;
+        public int? ModifiedById { get; set; } // for demo it can be null
 
         public int? GroupReservationId { get; set; }
     }

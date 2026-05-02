@@ -1,8 +1,9 @@
 ﻿using PokojeCore.Data;
-using PokojeCore.Dtos;
 using Microsoft.EntityFrameworkCore;
 using PokojeCore.Models;
 using AutoMapper;
+using PokojeCore.Dtos;
+using AutoMapper.QueryableExtensions;
 
 namespace PokojeCore.Services
 {
@@ -29,43 +30,16 @@ namespace PokojeCore.Services
         public async Task<ReservationResponse> GetReservationByIdAsync(int id)
         {
             var reservation = await context.Reservations.Where(r => r.Id == id).
-                            Select(
-                            r => new ReservationResponse
-                            {
-                                Id = r.Id,
-                                Guests = r.Guests,
-                                CheckInDate = r.CheckInDate,
-                                CheckOutDate = r.CheckOutDate,
-                                Details = r.Details,
-                                VoucherId = r.VoucherId,
-                                ContactPerson = r.ContactPerson,
-                                Account = r.Account,
-                                Tasks = r.Tasks,
-                                ModifiedBy = r.ModifiedBy,
-                                GroupReservationId = r.GroupReservationId
-
-                            }
-                            ).FirstOrDefaultAsync();
+                            ProjectTo<ReservationResponse>(mapper.ConfigurationProvider)
+                            .FirstOrDefaultAsync();
             return reservation;
 
         }
 
         public async Task<List<ReservationResponse>> GetReservationsAsync()
+
             => await context.Reservations.AsNoTracking() //Faster queries and less memory usage
-                    .Select(r => new ReservationResponse
-                    {
-                        Id = r.Id,
-                        Guests = r.Guests,
-                        CheckInDate = r.CheckInDate,
-                        CheckOutDate = r.CheckOutDate,
-                        Details = r.Details,
-                        VoucherId = r.VoucherId,
-                        ContactPerson = r.ContactPerson,
-                        Account = r.Account,
-                        Tasks = r.Tasks,
-                        ModifiedBy = r.ModifiedBy,
-                        GroupReservationId = r.GroupReservationId
-                    })
+                    .ProjectTo<ReservationResponse>(mapper.ConfigurationProvider)
                     .ToListAsync();
 
         public async Task<bool> UpdateReservationAsync(int id, ReservationRequest request)

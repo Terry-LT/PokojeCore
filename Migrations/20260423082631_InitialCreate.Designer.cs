@@ -12,7 +12,7 @@ using PokojeCore.Data;
 namespace PokojeCore.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260418091037_InitialCreate")]
+    [Migration("20260423082631_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -38,6 +38,47 @@ namespace PokojeCore.Migrations
                     b.HasIndex("ReservationsId");
 
                     b.ToTable("GuestReservation");
+                });
+
+            modelBuilder.Entity("PokojeCore.Models.Account", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.ToTable("Accounts");
                 });
 
             modelBuilder.Entity("PokojeCore.Models.Guest", b =>
@@ -121,7 +162,7 @@ namespace PokojeCore.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Guest");
+                    b.ToTable("Guests");
                 });
 
             modelBuilder.Entity("PokojeCore.Models.Reservation", b =>
@@ -131,9 +172,6 @@ namespace PokojeCore.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Account")
-                        .HasColumnType("int");
 
                     b.Property<DateTime>("CheckInDate")
                         .HasColumnType("datetime2");
@@ -148,6 +186,9 @@ namespace PokojeCore.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
                     b.Property<string>("Details")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -155,9 +196,8 @@ namespace PokojeCore.Migrations
                     b.Property<int?>("GroupReservationId")
                         .HasColumnType("int");
 
-                    b.Property<string>("ModifiedBy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("ModifiedById")
+                        .HasColumnType("int");
 
                     b.Property<string>("Tasks")
                         .IsRequired()
@@ -170,6 +210,10 @@ namespace PokojeCore.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("ModifiedById");
 
                     b.ToTable("Reservations");
                 });
@@ -187,6 +231,21 @@ namespace PokojeCore.Migrations
                         .HasForeignKey("ReservationsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("PokojeCore.Models.Reservation", b =>
+                {
+                    b.HasOne("PokojeCore.Models.Account", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.HasOne("PokojeCore.Models.Account", "ModifiedBy")
+                        .WithMany()
+                        .HasForeignKey("ModifiedById");
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ModifiedBy");
                 });
 #pragma warning restore 612, 618
         }

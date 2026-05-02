@@ -6,5 +6,7 @@ namespace PokojeCore.Data
     public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
     {
         public DbSet<Reservation> Reservations => Set<Reservation>();
+        public DbSet<Guest> Guests => Set<Guest>();
+        public DbSet<Account> Accounts => Set<Account>();
     }
 }

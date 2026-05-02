@@ -12,7 +12,26 @@ namespace PokojeCore.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Guest",
+                name: "Accounts",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Role = table.Column<int>(type: "int", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Accounts", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Guests",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -39,7 +58,7 @@ namespace PokojeCore.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Guest", x => x.Id);
+                    table.PrimaryKey("PK_Guests", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -53,9 +72,9 @@ namespace PokojeCore.Migrations
                     Details = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     VoucherId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ContactPerson = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Account = table.Column<int>(type: "int", nullable: false),
+                    CreatedById = table.Column<int>(type: "int", nullable: true),
                     Tasks = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ModifiedById = table.Column<int>(type: "int", nullable: true),
                     GroupReservationId = table.Column<int>(type: "int", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -63,6 +82,16 @@ namespace PokojeCore.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Reservations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Reservations_Accounts_CreatedById",
+                        column: x => x.CreatedById,
+                        principalTable: "Accounts",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Reservations_Accounts_ModifiedById",
+                        column: x => x.ModifiedById,
+                        principalTable: "Accounts",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -76,9 +105,9 @@ namespace PokojeCore.Migrations
                 {
                     table.PrimaryKey("PK_GuestReservation", x => new { x.GuestsId, x.ReservationsId });
                     table.ForeignKey(
-                        name: "FK_GuestReservation_Guest_GuestsId",
+                        name: "FK_GuestReservation_Guests_GuestsId",
                         column: x => x.GuestsId,
-                        principalTable: "Guest",
+                        principalTable: "Guests",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -90,9 +119,25 @@ namespace PokojeCore.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Accounts_Email",
+                table: "Accounts",
+                column: "Email",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_GuestReservation_ReservationsId",
                 table: "GuestReservation",
                 column: "ReservationsId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reservations_CreatedById",
+                table: "Reservations",
+                column: "CreatedById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reservations_ModifiedById",
+                table: "Reservations",
+                column: "ModifiedById");
         }
 
         /// <inheritdoc />
@@ -102,10 +147,13 @@ namespace PokojeCore.Migrations
                 name: "GuestReservation");
 
             migrationBuilder.DropTable(
-                name: "Guest");
+                name: "Guests");
 
             migrationBuilder.DropTable(
                 name: "Reservations");
+
+            migrationBuilder.DropTable(
+                name: "Accounts");
         }
     }
 }
